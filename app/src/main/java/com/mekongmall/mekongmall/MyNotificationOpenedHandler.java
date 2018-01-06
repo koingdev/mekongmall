@@ -10,21 +10,21 @@ import org.json.JSONObject;
  * Created by koingdev on 1/4/18.
  */
 
-public class MyNotificationOpenedHandler implements OneSignal.NotificationOpenedHandler{
+public class MyNotificationOpenedHandler implements OneSignal.NotificationOpenedHandler {
 
     // This fires when a notification is opened by tapping on it.
     @Override
     public void notificationOpened(OSNotificationOpenResult result) {
         JSONObject data = result.notification.payload.additionalData;
-        Context appContext = MainActivity.getContext();
+        Context appContext = SplashActivity.getContext();
         String urlFromNotification;
-        // Retrieve the url from Notification and pass it to MainActivity
+        // Retrieve the url from Notification and pass it to SplashActivity
         // And if user clicks on the notification
-        // It will open the webview of that url in MainActivity
+        // It will open the webview of that url in SplashActivity
         if (data != null) {
             urlFromNotification = data.optString("urlFromNotification", null);
             if (urlFromNotification != null) {
-                Intent intent = new Intent(appContext, MainActivity.class);
+                Intent intent = new Intent(appContext, SplashActivity.class);
                 intent.putExtra("urlFromNotification", urlFromNotification);
                 // Normally when we launch new activity, its previous activities will be kept in a queue
                 // like a stack of activities. So if we want to kill all the previous activities

@@ -4,8 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
+import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 
 import com.onesignal.OneSignal;
 import com.wang.avi.AVLoadingIndicatorView;
@@ -16,19 +20,14 @@ import com.wang.avi.AVLoadingIndicatorView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static Context context;
+    private WebView webView;
+    private AVLoadingIndicatorView indicatorView;
     private String urlFromNotification;
     private final String MAIN_URL = "http://mekong-mall.com/";
-    private final String SCREEN_TITLE = "Mekong Mall";
-
-    public static Context getContext() {
-        return context;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        context = getApplicationContext();
 
         // MyNotificationOpenedHandler: This will be called when a notification is tapped on
         OneSignal.startInit(this)
@@ -38,35 +37,32 @@ public class MainActivity extends AppCompatActivity {
                 .init();
 
         setContentView(R.layout.activity_main);
-        this.setTitle(SCREEN_TITLE);
 
-        final AVLoadingIndicatorView indicatorView = findViewById(R.id.avi);
-        indicatorView.show();
+        indicatorView = findViewById(R.id.avi);
 
-        WebView webView = findViewById(R.id.webView);
+        webView = findViewById(R.id.webView);
+        webView.setWebViewClient(new CustomWebViewClient(indicatorView));
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setLoadWithOverviewMode(true);
         webView.getSettings().setUseWideViewPort(true);
 
-        /**
-         * Hide loading indicator when page is loading
-         */
-        webView.setWebViewClient(new WebViewClient(){
-            public void onPageCommitVisible(WebView view, String url) {
-                super.onPageCommitVisible(view, url);
-                indicatorView.hide();
-            }
-        });
-
+        // Get notification data from SplashActivity
         Bundle extra = getIntent().getExtras();
         if (extra != null) {
             urlFromNotification = extra.getString("urlFromNotification");
-        }
-
-        if (urlFromNotification != null) {
             webView.loadUrl(urlFromNotification);
         } else {
             webView.loadUrl(MAIN_URL);
         }
     }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && webView.canGoBack()) {
+            webView.goBack();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
 }
