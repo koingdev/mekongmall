@@ -1,23 +1,17 @@
 package com.mekongmall.mekongmall;
 
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.onesignal.OneSignal;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -49,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
                 .init();
 
         setContentView(R.layout.activity_main);
+
         indicatorView = findViewById(R.id.avi);
         webView = findViewById(R.id.webView);
         sadCloud = findViewById(R.id.sad_cloud);
@@ -71,12 +66,14 @@ public class MainActivity extends AppCompatActivity {
         webView.loadUrl(url);
     }
 
+    // btnRetry's onClick
     public void retry(View view) {
-        webView.setVisibility(View.VISIBLE);
         sadCloud.setVisibility(View.INVISIBLE);
         btnRetry.setVisibility(View.INVISIBLE);
         noInternet.setVisibility(View.INVISIBLE);
         noInternetDetail.setVisibility(View.INVISIBLE);
+
+        webView.setVisibility(View.VISIBLE);
         webView.loadUrl(url);
         clearHistory = true;
     }
@@ -94,9 +91,10 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-            // Show nothing when page error
+            // Show nothing when page error and hide webview
             webView.loadUrl("");
             webView.setVisibility(View.INVISIBLE);
+
             sadCloud.setVisibility(View.VISIBLE);
             btnRetry.setVisibility(View.VISIBLE);
             noInternet.setVisibility(View.VISIBLE);
@@ -113,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
             // Hide loading indicator when page is loading
             indicatorView.hide();
         }
+
         @Override
         public void onPageFinished(WebView view, String url) {
             if (clearHistory) {
@@ -122,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
             }
             super.onPageFinished(view, url);
         }
+
     }
 
 }

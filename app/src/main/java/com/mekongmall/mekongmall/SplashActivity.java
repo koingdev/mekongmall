@@ -26,10 +26,11 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         context = getApplicationContext();
 
-        View decorView = getWindow().getDecorView();
         // Hide the status bar.
+        View decorView = getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
+
         setContentView(R.layout.activity_splash);
 
         // Get notification data when user tap on Notification
@@ -38,7 +39,7 @@ public class SplashActivity extends AppCompatActivity {
             urlFromNotification = extra.getString("urlFromNotification");
         }
 
-        new Handler().postDelayed(new Runnable(){
+        new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 Intent intent = new Intent(SplashActivity.this, MainActivity.class);
