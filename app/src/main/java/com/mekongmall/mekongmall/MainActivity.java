@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         webView = findViewById(R.id.webView);
         webView.setWebViewClient(new CustomWebViewClient(indicatorView));
         webView.getSettings().setJavaScriptEnabled(true);
+        webView.clearCache(true);
         webView.getSettings().setLoadWithOverviewMode(true);
         webView.getSettings().setUseWideViewPort(true);
 
