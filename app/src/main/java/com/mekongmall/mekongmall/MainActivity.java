@@ -1,10 +1,14 @@
 package com.mekongmall.mekongmall;
 
+import android.annotation.TargetApi;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
@@ -28,8 +32,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView noInternetDetail;
     private TextView noInternet;
 
-    private String url = "http://mekong-mall.com/";
-    private boolean clearHistory = false;
+    Runnable uiThread;
+    Runnable backgroundThread;
+    WebChromeClient webChromeClient;
+
+    private String url = "http://mekongmalls.com/";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,6 +51,12 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
+        // Get notification data from SplashActivity
+        Bundle extra = getIntent().getExtras();
+        if (extra != null) {
+            url = extra.getString("urlFromNotification");
+        }
+
         indicatorView = findViewById(R.id.avi);
         webView = findViewById(R.id.webView);
         sadCloud = findViewById(R.id.sad_cloud);
@@ -51,75 +64,88 @@ public class MainActivity extends AppCompatActivity {
         noInternet = findViewById(R.id.no_internet);
         noInternetDetail = findViewById(R.id.no_internet_detail);
 
-        webView.setWebViewClient(new CustomWebViewClient());
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.clearCache(true);
-        webView.clearHistory();
-        webView.getSettings().setLoadWithOverviewMode(true);
-        webView.getSettings().setUseWideViewPort(true);
+        backgroundThread = new Runnable() {
+            @Override
+            public void run() {
 
-        // Get notification data from SplashActivity
-        Bundle extra = getIntent().getExtras();
-        if (extra != null) {
-            url = extra.getString("urlFromNotification");
-        }
-        webView.loadUrl(url);
+                webView.setVisibility(View.INVISIBLE);
+                webView.setWebViewClient(new CustomWebViewClient());
+                webView.getSettings().setJavaScriptEnabled(true);
+                webView.clearCache(true);
+                webView.clearHistory();
+                webView.getSettings().setLoadWithOverviewMode(true);
+                webView.getSettings().setUseWideViewPort(true);
+                webView.loadUrl(url);
+
+            }
+        };
+
+        webChromeClient = new WebChromeClient() {
+            @Override
+            public void onProgressChanged(WebView view, int newProgress) {
+                if (newProgress >= 80) {
+                    view.setVisibility(View.VISIBLE);
+                    indicatorView.hide();
+                }
+            }
+        };
+
+        uiThread = new Runnable() {
+            @Override
+            public void run() {
+                webView.setWebChromeClient(webChromeClient);
+            }
+        };
+
+        webView.post(backgroundThread);
+
+        runOnUiThread(uiThread);
+
     }
 
     // btnRetry's onClick
     public void retry(View view) {
+
+        indicatorView.setVisibility(View.VISIBLE);
+        indicatorView.show();
+
         sadCloud.setVisibility(View.INVISIBLE);
         btnRetry.setVisibility(View.INVISIBLE);
         noInternet.setVisibility(View.INVISIBLE);
         noInternetDetail.setVisibility(View.INVISIBLE);
 
-        webView.setVisibility(View.VISIBLE);
-        webView.loadUrl(url);
-        clearHistory = true;
+        webView.post(new Runnable() {
+            @Override
+            public void run() {
+                webView.setVisibility(View.INVISIBLE);
+                webView.loadUrl(url);
+            }
+        });
+
+        runOnUiThread(uiThread);
+
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK && webView.canGoBack()) {
-            webView.goBack();
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     private class CustomWebViewClient extends WebViewClient {
 
+        @SuppressWarnings("deprecation")
         @Override
-        public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+        public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+
             // Show nothing when page error and hide webview
-            webView.loadUrl("");
-            webView.setVisibility(View.INVISIBLE);
+            view.loadUrl("about:blank");
+            view.setVisibility(View.INVISIBLE);
 
             sadCloud.setVisibility(View.VISIBLE);
             btnRetry.setVisibility(View.VISIBLE);
             noInternet.setVisibility(View.VISIBLE);
             noInternetDetail.setVisibility(View.VISIBLE);
-        }
 
-        @Override
-        public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            indicatorView.show();
-        }
-
-        @Override
-        public void onPageCommitVisible(WebView view, String url) {
-            // Hide loading indicator when page is loading
-            indicatorView.hide();
-        }
-
-        @Override
-        public void onPageFinished(WebView view, String url) {
-            if (clearHistory) {
-                clearHistory = false;
-                webView.clearHistory();
-                webView.clearCache(true);
-            }
-            super.onPageFinished(view, url);
         }
 
     }

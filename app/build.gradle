@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.mekongmall.mekongmall"
-        manifestPlaceholders = [onesignal_app_id: "5a6cd0a8-ffcb-47dd-98dd-f7d27c5e6b5a",
+        manifestPlaceholders = [onesignal_app_id: "aabc9604-693e-43df-b500-dd13253fa21f",
                                 // Project number pulled from dashboard, local value is ignored.
                                 onesignal_google_project_number: "REMOTE"]
         minSdkVersion 16
