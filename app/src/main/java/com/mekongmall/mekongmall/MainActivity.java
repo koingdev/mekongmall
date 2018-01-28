@@ -1,16 +1,9 @@
 package com.mekongmall.mekongmall;
 
-import android.annotation.TargetApi;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
@@ -83,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         webChromeClient = new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
-                if (newProgress >= 80) {
+                if (newProgress >= 70) {
                     view.setVisibility(View.VISIBLE);
                     indicatorView.hide();
                 }

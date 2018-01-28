@@ -22,7 +22,7 @@ public class MyNotificationOpenedHandler implements OneSignal.NotificationOpened
         // And if user clicks on the notification
         // It will open the webview of that url in SplashActivity
         if (data != null) {
-            urlFromNotification = data.optString("urlFromNotification", null);
+            urlFromNotification = data.optString("OpenURL", null);
             if (urlFromNotification != null) {
                 Intent intent = new Intent(appContext, SplashActivity.class);
                 intent.putExtra("urlFromNotification", urlFromNotification);
